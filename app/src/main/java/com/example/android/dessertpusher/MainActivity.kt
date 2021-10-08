@@ -18,6 +18,7 @@ package com.example.android.dessertpusher
 
 import android.content.ActivityNotFoundException
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
@@ -26,6 +27,11 @@ import androidx.core.app.ShareCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LifecycleObserver
 import com.example.android.dessertpusher.databinding.ActivityMainBinding
+import timber.log.Timber
+
+const val KEY_REVENUE = "key_revenue"
+const val KEY_SOLD = "key_dessertsSold"
+const val KEY_TIMER = "key_dessertTime"
 
 class MainActivity : AppCompatActivity(), LifecycleObserver {
 
@@ -61,15 +67,24 @@ class MainActivity : AppCompatActivity(), LifecycleObserver {
             Dessert(R.drawable.oreo, 6000, 20000)
     )
     private var currentDessert = allDesserts[0]
+    private lateinit var dessertTime: DessertTimer
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        Timber.i("onCreate called")
         // Use Data Binding to get reference to the views
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
         binding.dessertButton.setOnClickListener {
             onDessertClicked()
+        }
+        dessertTime = DessertTimer(this.lifecycle)
+
+        if (savedInstanceState != null){
+            revenue = savedInstanceState.getInt(KEY_REVENUE)
+            dessertsSold = savedInstanceState.getInt(KEY_SOLD)
+            dessertTime.secondsCount = savedInstanceState.getInt(KEY_TIMER)
         }
 
         // Set the TextViews to the right values
@@ -78,6 +93,44 @@ class MainActivity : AppCompatActivity(), LifecycleObserver {
 
         // Make sure the correct dessert is showing
         binding.dessertButton.setImageResource(currentDessert.imageId)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putInt(KEY_REVENUE, revenue)
+        outState.putInt(KEY_SOLD, dessertsSold)
+        outState.putInt(KEY_TIMER, dessertTime.secondsCount)
+        Timber.i("onSaveInstanceState called")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Timber.i("onResume called")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Timber.i("onPause called")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Timber.i("onDestroy called")
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+        Timber.i("onRestart called")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Timber.i("onStop called")
+    }
+
+    override fun onStart() {
+        super.onStart()
+        Timber.i("onStart called")
     }
 
     /**
